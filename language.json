@@ -1,0 +1,17 @@
+{
+	"Add macro": {
+		"de": "Macro hinzufügen"
+	},
+	"Save settings": {
+		"de": "Einstellungen speichern"
+	},
+	"Macro:": {
+		"de": "Macro:"
+	},
+	"Replacement:": {
+		"de": "Ersetzen durch:"
+	},
+	"Is always prepended by a tilde (~) character and can only contain letters and numbers": {
+		"de": "Es wird immer eine Tilde vorangestellt und kann nur Buchstaben und Zahlen enthalten"
+	}
+}
