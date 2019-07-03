@@ -1,37 +1,46 @@
 <macrolist>
 	
-	<macro each={ macro in macros } no-reorder macro={ macro }></macro>
+	<macro each={ macro in macros } macro={ macro } addon={ addon }></macro>
 	<button ref="addmacro"></button>
 	<button ref="savemacros"></button>
 
 	<script>
-		const self = this
-		this.macros = []
-		this.addon = null
+		export default {
+			onBeforeMount() {
+				this.macros = []
+				this.addon = this.props.addon
+				this.makeAccessible()
+			},
 
-		this.on('mount', () => {
-			self.addon = Tool.addons.getAddon('macro')
-			self.refs.addmacro.innerHTML = self.addon.i18n.__('Add macro')
-			self.refs.savemacros.innerHTML = self.addon.i18n.__('Save settings')
+			onMounted() {
+				this.refs = {
+					addmacro: this.$('[ref=addmacro]'),
+					savemacros: this.$('[ref=savemacros]')
+				}
+				this.refs.addmacro.innerHTML = this.addon.i18n.__('Add macro')
+				this.refs.savemacros.innerHTML = this.addon.i18n.__('Save settings')
 
-			self.refs.addmacro.onclick = self.addmacro
-			self.refs.savemacros.onclick = self.savemacros
+				this.refs.addmacro.onclick = this.addmacro
+				this.refs.savemacros.onclick = this.savemacros
 
-			self.reloadsettings()
-		})
+				this.reloadsettings()
+			},
 
-		addmacro() {
-			self.macros.push({'macro': '', 'replace': ''})
-			self.update()
-		}
+			addmacro() {
+				this.macros.push({'macro': '', 'replace': ''})
+				this.update()
+			},
 
-		savemacros() {
-			self.addon.saveMacros()
-		}
+			savemacros() {
+				this.addon.saveMacros()
+			},
 
-		reloadsettings() {
-			self.macros = self.addon.settings
-			self.update()
+			reloadsettings() {
+				this.macros = []
+				this.update()
+				this.macros = this.addon.settings
+				this.update()
+			}
 		}
 	</script>
 </macrolist>

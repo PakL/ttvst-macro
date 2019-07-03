@@ -13,43 +13,41 @@ class Macro extends UIPage {
 		this.contentElement.style.padding = '10px'
 		this.settings = tool.settings.getJSON('macros', [])
 
-		const self = this
-		this.tool.on('load', () => {
-			let macrolist = document.createElement('macrolist')
+		let macrosTag = fs.readFileSync(__dirname.replace(/\\/g, '/') + '/res/macro.tag', { encoding: 'utf8' })
+		let code = riot.compileFromString(macrosTag).code
+		riot.inject(code, 'macro', document.location.href)
 
-			self.contentElement.appendChild(macrolist)
-			document.querySelector('#contents').appendChild(self.contentElement)
-			
-			let macroScriptElement = document.createElement('script')
-			macroScriptElement.setAttribute('type', 'application/javascript')
-			macroScriptElement.setAttribute('src', '/' + __dirname.replace(/\\/g, '/') + '/res/macro.js')
-			macroScriptElement.addEventListener('load', () => {
-				let macroListScriptElement = document.createElement('script')
-				macroListScriptElement.setAttribute('type', 'application/javascript')
-				macroListScriptElement.setAttribute('src', '/' + __dirname.replace(/\\/g, '/') + '/res/macrolist.js')
-				macroListScriptElement.addEventListener('load', () => {
-					riot.mount(macrolist)
+		let macroslistTag = fs.readFileSync(__dirname.replace(/\\/g, '/') + '/res/macrolist.tag', { encoding: 'utf8' })
+		code = riot.compileFromString(macroslistTag).code
+		riot.inject(code, 'macrolist', document.location.href)
+
+
+		let macrolist = document.createElement('macrolist')
+
+		this.contentElement.appendChild(macrolist)
+		document.querySelector('#contents').appendChild(this.contentElement)
+
+		riot.mount(macrolist, { addon: this })
+
+		let cockpit = this.tool.cockpit;
+		if(cockpit != null) {
+			let chatmessage = document.querySelector('#chat_message')
+			const self = this
+			chatmessage.addEventListener('keyup', () => {
+				let newMessage = chatmessage.value
+				self.settings.forEach((m) => {
+					let rx = new RegExp('(\\s|^)(' + m.macro + ')($|\\s)', 'g')
+					newMessage = newMessage.replace(rx, '$1' + m.replace + '$3')
 				})
-				document.querySelector('body').appendChild(macroListScriptElement)
+				if(newMessage != chatmessage.value) {
+					chatmessage.value = newMessage
+				}
 			})
-			document.querySelector('body').appendChild(macroScriptElement)
+		}
+	}
 
-			
-			let cockpit = self.tool.cockpit;
-			if(cockpit != null) {
-				let chatmessage = document.querySelector('#chat_message')
-				chatmessage.addEventListener('keyup', () => {
-					let newMessage = chatmessage.value
-					self.settings.forEach((m) => {
-						let rx = new RegExp('(\\s|^)(' + m.macro + ')($|\\s)', 'g')
-						newMessage = newMessage.replace(rx, '$1' + m.replace + '$3')
-					})
-					if(newMessage != chatmessage.value) {
-						chatmessage.value = newMessage
-					}
-				})
-			}
-		})
+	get icon() {
+		return '🔖'
 	}
 
 	saveMacros() {

@@ -2,44 +2,51 @@
 	<fieldset>
 		<label>
 			<span ref="lang_macro"></span>
-			<input type="text" ref="macro" value="{ macro }" class="macro">
+			<input type="text" ref="macro" value={ macro } class="macro">
 			<small ref="lang_macro_desc"></small>
 		</label>
 		<label>
 			<span ref="lang_replace"></span>
-			<input type="text" ref="replace" value="{ replace }" class="replace">
+			<input type="text" ref="replace" value={ replace } class="replace">
 		</label>
 	</fieldset>
 
 	<script>
-		const self = this
-		this.addon = null
+		export default {
+			onBeforeMount() {
+				this.addon = this.props.addon
+				this.macro = this.props.macro.macro
+				this.replace = this.props.macro.replace
+			},
 
-		console.log(this.opts.macro)
-		this.macro = this.opts.macro.macro
-		this.replace = this.opts.macro.replace
-
-		this.on('mount', () => {
-			self.addon = Tool.addons.getAddon('macro')
-			self.refs.lang_macro.innerText = self.addon.i18n.__('Macro:')
-			self.refs.lang_replace.innerText = self.addon.i18n.__('Replacement:')
-			self.refs.lang_macro_desc.innerText = self.addon.i18n.__('Is always prepended by a tilde (~) character and can only contain letters and numbers')
-
-			self.refs.macro.onkeyup = () => {
-				if(!self.refs.macro.value.startsWith('~')) {
-					self.refs.macro.value = '~' + self.refs.macro.value
+			onMounted() {
+				this.refs = {
+					lang_macro: this.$('[ref=lang_macro]'),
+					macro: this.$('[ref=macro]'),
+					lang_macro_desc: this.$('[ref=lang_macro_desc]'),
+					lang_replace: this.$('[ref=lang_replace]'),
+					replace: this.$('[ref=replace]')
 				}
-				let m = self.refs.macro.value.substr(1)
-				if(m != m.replace(/[^a-z0-9]/ig, '')) {
-					self.refs.macro.value = '~' + m.replace(/[^a-z0-9]/ig, '')
+
+				this.refs.lang_macro.innerText = this.addon.i18n.__('Macro:')
+				this.refs.lang_replace.innerText = this.addon.i18n.__('Replacement:')
+				this.refs.lang_macro_desc.innerText = this.addon.i18n.__('Is always prepended by a tilde (~) character and can only contain letters and numbers')
+
+				const self = this
+				this.refs.macro.onkeyup = () => {
+					if(!self.refs.macro.value.startsWith('~')) {
+						self.refs.macro.value = '~' + self.refs.macro.value
+					}
+					let m = self.refs.macro.value.substr(1)
+					if(m != m.replace(/[^a-z0-9]/ig, '')) {
+						self.refs.macro.value = '~' + m.replace(/[^a-z0-9]/ig, '')
+					}
 				}
+			},
+			onBeforeUpdate() {
+				this.macro = this.props.macro.macro
+				this.replace = this.props.macro.replace
 			}
-
-			self.update()
-		})
-		this.on('update', () => {
-			self.macro = self.opts.macro.macro
-			self.replace = self.opts.macro.replace
-		})
+		}
 	</script>
 </macro>
