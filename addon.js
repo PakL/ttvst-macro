@@ -47,7 +47,7 @@ class Macro extends UIPage {
 	}
 
 	get icon() {
-		return '🔖'
+		return 'ProcessMetaTask'
 	}
 
 	saveMacros() {
